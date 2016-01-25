@@ -1,0 +1,57 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Yii console bootstrap file.
+ *
+ * @link http://www.yiiframework.com/
+ * @copyright Copyright (c) 2008 Yii Software LLC
+ * @license http://www.yiiframework.com/license/
+ */
+
+ini_set ( 'date.timezone', 'Asia/Shanghai' );
+
+$env = 'prod';
+$offline = [ 
+		'dev',
+		'test' 
+];
+
+if (isset ( $_SERVER ['RUNTIME_ENVIROMENT'] ) && $_SERVER ['RUNTIME_ENVIROMENT']) {
+	$env = strtolower ( $_SERVER ['RUNTIME_ENVIROMENT'] );
+}
+
+if (! in_array ( $env, $offline )) {
+	header ( 'Runtime-Enviroment: ' . $env );
+	error_reporting ( E_ALL );
+	ini_set ( 'display_errors', 1 );
+} else {
+	error_reporting ( 0 );
+	ini_set ( 'display_errors', 0 );
+}
+
+// comment out the following two lines when deployed to production
+if (in_array ( $env, $offline )) {
+	defined ( 'YII_DEBUG' ) or define ( 'YII_DEBUG', true );
+	defined ( 'YII_ENV' ) or define ( 'YII_ENV', 'dev' );
+} else {
+	defined ( 'YII_ENV' ) or define ( 'YII_ENV', 'prod' );
+}
+defined ( 'SERVER_ONLINE' ) or define ( "SERVER_ONLINE",  !in_array ( $env, $offline ) ); // Speed oauth used
+
+// fcgi doesn't have STDIN and STDOUT defined by default
+defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
+defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
+
+require(__DIR__ . '/vendor/autoload.php');
+require(__DIR__ . '/vendor/yiisoft/yii2/Yii.php');
+
+
+if (in_array ( $env, $offline )) {
+	$config = require(__DIR__ . '/config/test/console.php');
+} else {
+	$config = require(__DIR__ . '/config/console.php');
+}
+
+$application = new yii\console\Application($config);
+$exitCode = $application->run();
+exit($exitCode);

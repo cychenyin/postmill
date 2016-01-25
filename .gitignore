@@ -1,0 +1,8 @@
+.project
+deployment.properties
+*.bak
+.buildpath
+.settings/
+*.swp
+protected/runtime/*
+.DS_Store
